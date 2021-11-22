@@ -8,8 +8,8 @@
             "name": "Launch Package",
             "type": "go",
             "request": "launch",
-            "mode": "auto",
-            "program": "${fileDirname}",
+            "mode": "debug",
+            "program": "/Users/hcongvan/Documents/go",
             "debugAdapter": "dlv-dap"
         }
     ]

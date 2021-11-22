@@ -1,54 +1,70 @@
 package model
 
 import (
-	"fmt"
+	"log"
 
 	"gorm.io/gorm"
 )
 
 type NoteModel struct {
 	gorm.Model
-	Id    uint
-	User  string
-	Title string
-	Note  string
+	User  string `json:"user"`
+	Title string `json:"title" binding:"required"`
+	Note  string `json:"note" binding:"required"`
 }
 
-func (r NoteModel) CreateNote(db *gorm.DB) {
+func (r NoteModel) CreateNote(db *gorm.DB) (NoteModel, bool) {
 	result := db.Create(&r)
-	if result != nil {
-		fmt.Printf("Can't not create")
-	}
-}
-
-func (r NoteModel) GetAllNote(db *gorm.DB) {
-	result := db.Find(&NoteModel{})
 	if result == nil {
-		fmt.Printf("tach luon roi")
+		log.Println("Can't create record")
+		return NoteModel{}, true
 	}
-
+	return r, false
 }
 
-func (r NoteModel) QueryNotebyUser(user string, db *gorm.DB) {
-
+func (r NoteModel) GetAllNote(db *gorm.DB) []NoteModel {
+	var notes []NoteModel
+	result := db.Find(&notes)
+	if result == nil {
+		log.Println("Something wrong went get all record")
+	}
+	return notes
 }
 
-func (r NoteModel) QueryNotebyId(id uint) {
-
-}
-
-func (r NoteModel) UpdateNotebyId(db *gorm.DB) {
+func (r NoteModel) QueryNote(db *gorm.DB) NoteModel {
 	result := db.First(&r)
 	if result == nil {
-		panic("tach cmnr")
+		log.Println("Can't find the record")
 	}
-	db.Save(&r)
+	return r
 }
 
-func (r NoteModel) DeleteNotebyId(db *gorm.DB) {
+func (r NoteModel) UpdateNotebyId(db *gorm.DB) (NoteModel, bool) {
+	_r := r
+	result := db.First(&_r)
+	if result == nil {
+		log.Println("Can't find the record to update")
+		return NoteModel{}, true
+	}
+	if r.User != "" {
+		_r.User = r.User
+	}
+	if r.Title != "" {
+		_r.Title = r.Title
+	}
+	if r.Note != "" {
+		_r.Note = r.Note
+	}
+	db.Save(&_r)
+	return _r, false
+}
+
+func (r NoteModel) DeleteNotebyId(db *gorm.DB) bool {
 	result := db.First(&r)
 	if result == nil {
-		panic("tach cmnr")
+		log.Println("Can't find record to delete")
+		return true
 	}
 	db.Delete(&r)
+	return false
 }

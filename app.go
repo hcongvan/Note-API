@@ -1,15 +1,5 @@
 package main
 
 func main() {
-
-	app := InitRoute()
-	app.Run()
+	InitApp()
 }
-
-// package main
-
-// import "fmt"
-
-// func main() {
-// 	fmt.Println("hello world")
-// }
