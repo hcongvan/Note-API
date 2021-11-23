@@ -13,7 +13,7 @@ type NoteModel struct {
 	Note  string `json:"note" binding:"required"`
 }
 
-func (r NoteModel) CreateNote(db *gorm.DB) (NoteModel, bool) {
+func (r NoteModel) CreateNote() (NoteModel, bool) {
 	result := db.Create(&r)
 	if result == nil {
 		log.Println("Can't create record")
@@ -22,7 +22,7 @@ func (r NoteModel) CreateNote(db *gorm.DB) (NoteModel, bool) {
 	return r, false
 }
 
-func (r NoteModel) GetAllNote(db *gorm.DB) []NoteModel {
+func (r NoteModel) GetAllNote() []NoteModel {
 	var notes []NoteModel
 	result := db.Find(&notes)
 	if result == nil {
@@ -31,7 +31,7 @@ func (r NoteModel) GetAllNote(db *gorm.DB) []NoteModel {
 	return notes
 }
 
-func (r NoteModel) QueryNote(db *gorm.DB) NoteModel {
+func (r NoteModel) QueryNote() NoteModel {
 	result := db.First(&r)
 	if result == nil {
 		log.Println("Can't find the record")
@@ -39,7 +39,7 @@ func (r NoteModel) QueryNote(db *gorm.DB) NoteModel {
 	return r
 }
 
-func (r NoteModel) UpdateNotebyId(db *gorm.DB) (NoteModel, bool) {
+func (r NoteModel) UpdateNotebyId() (NoteModel, bool) {
 	_r := r
 	result := db.First(&_r)
 	if result == nil {
@@ -59,7 +59,7 @@ func (r NoteModel) UpdateNotebyId(db *gorm.DB) (NoteModel, bool) {
 	return _r, false
 }
 
-func (r NoteModel) DeleteNotebyId(db *gorm.DB) bool {
+func (r NoteModel) DeleteNotebyId() bool {
 	result := db.First(&r)
 	if result == nil {
 		log.Println("Can't find record to delete")

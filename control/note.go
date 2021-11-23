@@ -10,7 +10,7 @@ import (
 
 func GetAllNote(c *gin.Context) {
 	// var notes []model.NoteModel
-	notes := model.NoteModel{}.GetAllNote(model.DB)
+	notes := model.NoteModel{}.GetAllNote()
 	c.JSON(http.StatusOK, ResponseMsg{Code: OK, Result: notes})
 }
 
@@ -20,7 +20,7 @@ func CreateNote(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, ResponseMsg{Code: Error, Result: Message{Msg: DataWrong}})
 		return
 	}
-	newNote, err := newNote.CreateNote(model.DB)
+	newNote, err := newNote.CreateNote()
 	if err {
 		c.JSON(http.StatusBadRequest, ResponseMsg{Code: Error, Result: Message{Msg: BadData}})
 		return
@@ -40,7 +40,7 @@ func UpdateNote(c *gin.Context) {
 		return
 	}
 	updateNote.ID = uint(id)
-	updateNote, err := updateNote.UpdateNotebyId(model.DB)
+	updateNote, err := updateNote.UpdateNotebyId()
 	if err {
 		c.JSON(http.StatusBadRequest, ResponseMsg{Code: Error, Result: Message{Msg: DontExist}})
 		return
@@ -56,7 +56,7 @@ func DeleteNote(c *gin.Context) {
 		return
 	}
 	deleteNote.ID = uint(id)
-	err := deleteNote.DeleteNotebyId(model.DB)
+	err := deleteNote.DeleteNotebyId()
 	if err {
 		c.JSON(http.StatusBadRequest, ResponseMsg{Code: Error, Result: Message{Msg: DontExist}})
 		return
