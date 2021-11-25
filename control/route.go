@@ -1,7 +1,10 @@
 package control
 
 import (
+	"log"
+
 	"github.com/gin-gonic/gin"
+	"github.com/streadway/amqp"
 )
 
 type ResponseMsg struct {
@@ -23,7 +26,11 @@ const (
 	DontExist         = "Record don't exist"
 	NoteDelete        = "Note deleted"
 	BadData           = "Bad data"
+	BadConn           = "Bad connection"
 )
+
+var channel *amqp.Channel
+var rabbitmq *amqp.Connection
 
 func InitRoute() *gin.Engine {
 	_route := gin.Default()
@@ -34,4 +41,18 @@ func InitRoute() *gin.Engine {
 	_route.DELETE("notes/:id", DeleteNote)
 
 	return _route
+}
+
+func InitRabbitMQ() {
+	conn, err := amqp.Dial("amqp://rabbit-admin:xHc2zUkq4PZLeQ2C@42.119.139.251:31678/")
+	if err != nil {
+		log.Fatalf("%s: %s", err, "fail to connect")
+	}
+	ch, err := conn.Channel()
+	if err != nil {
+		log.Fatalf("%s: %s", err, "fail to open channel")
+	}
+	ch.Close()
+	channel = ch
+	rabbitmq = conn
 }

@@ -1,70 +1,76 @@
 package model
 
 import (
-	"log"
+	"time"
 
 	"gorm.io/gorm"
 )
 
 type NoteModel struct {
-	gorm.Model
-	User  string `json:"user"`
-	Title string `json:"title" binding:"required"`
-	Note  string `json:"note" binding:"required"`
+	Id       uint      `gorm:"primary_key, AUTO_INCREMENT" json:"id"`
+	User     string    `json:"user"`
+	Title    string    `json:"title" binding:"required"`
+	Note     string    `json:"note" binding:"required"`
+	CreateAt time.Time `json:"create_at"`
+	UpdateAt time.Time `json:"update_at"`
 }
 
-func (r NoteModel) CreateNote() (NoteModel, bool) {
+func (r *NoteModel) BeforeCreate(tx *gorm.DB) (err error) {
+	r.CreateAt = time.Now().UTC()
+	r.UpdateAt = time.Now().UTC()
+	return
+}
+
+func (r *NoteModel) BeforeUpdate(tx *gorm.DB) (err error) {
+	r.UpdateAt = time.Now().UTC()
+	return
+}
+
+func (r NoteModel) CreateNote() (NoteModel, error) {
 	result := db.Create(&r)
-	if result == nil {
-		log.Println("Can't create record")
-		return NoteModel{}, true
+	if result.Error != nil {
+		return NoteModel{}, result.Error
 	}
-	return r, false
+	return r, nil
 }
 
-func (r NoteModel) GetAllNote() []NoteModel {
+func (r NoteModel) GetAllNote() ([]NoteModel, error) {
 	var notes []NoteModel
 	result := db.Find(&notes)
-	if result == nil {
-		log.Println("Something wrong went get all record")
+	if result.Error != nil {
+		return []NoteModel{}, result.Error
 	}
-	return notes
+	return notes, nil
 }
 
-func (r NoteModel) QueryNote() NoteModel {
+func (r NoteModel) QueryNote() (NoteModel, error) {
 	result := db.First(&r)
-	if result == nil {
-		log.Println("Can't find the record")
+	if result.Error != nil {
+		return NoteModel{}, result.Error
 	}
-	return r
+	return r, nil
 }
 
-func (r NoteModel) UpdateNotebyId() (NoteModel, bool) {
+func (r NoteModel) UpdateNote(m map[string]interface{}) (NoteModel, error) {
 	_r := r
 	result := db.First(&_r)
-	if result == nil {
-		log.Println("Can't find the record to update")
-		return NoteModel{}, true
+	if result.Error != nil {
+		return NoteModel{}, result.Error
 	}
-	if r.User != "" {
-		_r.User = r.User
+
+	resultUpdate := db.Model(&_r).Select("*").Updates(m)
+	if resultUpdate.Error != nil {
+		return _r, resultUpdate.Error
 	}
-	if r.Title != "" {
-		_r.Title = r.Title
-	}
-	if r.Note != "" {
-		_r.Note = r.Note
-	}
-	db.Save(&_r)
-	return _r, false
+	return _r, nil
 }
 
-func (r NoteModel) DeleteNotebyId() bool {
-	result := db.First(&r)
-	if result == nil {
-		log.Println("Can't find record to delete")
-		return true
+func (r NoteModel) DeleteNote() error {
+	if result := db.First(&r); result.Error != nil {
+		return result.Error
 	}
-	db.Delete(&r)
-	return false
+	if resultDelete := db.Delete(&r); resultDelete.Error != nil {
+		return resultDelete.Error
+	}
+	return nil
 }
