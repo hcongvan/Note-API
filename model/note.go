@@ -43,9 +43,9 @@ func (r NoteModel) CreateNote() (NoteModel, error) {
 	return r, nil
 }
 
-func (r NoteModel) GetAllNote() ([]NoteModel, error) {
+func (r NoteModel) GetAllNote(offset int, limit int) ([]NoteModel, error) {
 	var notes []NoteModel
-	result := db.Find(&notes)
+	result := db.Limit(limit).Offset(offset).Find(&notes)
 	if result.Error != nil {
 		return []NoteModel{}, result.Error
 	}

@@ -10,7 +10,17 @@ import (
 
 func GetAllNote(c *gin.Context) {
 	// var notes []model.NoteModel
-	notes, err := model.NoteModel{}.GetAllNote()
+	limit, errparse := strconv.Atoi(c.Param("limit"))
+	if errparse != nil {
+		c.JSON(http.StatusOK, ResponseMsg{Code: OK, Result: Message{Msg: errparse.Error()}})
+		return
+	}
+	offset, errparse := strconv.Atoi(c.Param("offset"))
+	if errparse != nil {
+		c.JSON(http.StatusOK, ResponseMsg{Code: OK, Result: Message{Msg: errparse.Error()}})
+		return
+	}
+	notes, err := model.NoteModel{}.GetAllNote(offset, limit)
 	if err != nil {
 		c.JSON(http.StatusOK, ResponseMsg{Code: OK, Result: Message{Msg: BadConn}})
 		return
