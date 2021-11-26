@@ -19,6 +19,7 @@ func PublishMessage(body HistoryLog) error {
 	if errch != nil {
 		return errch
 	}
+	defer ch.Close()
 	bodyByte, errp := json.Marshal(body)
 	if errp != nil {
 		return errp

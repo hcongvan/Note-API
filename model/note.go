@@ -34,7 +34,7 @@ func (r NoteModel) CreateNote() (NoteModel, error) {
 	errch := PublishMessage(HistoryLog{
 		ID:       r.Id,
 		Previous: nil,
-		Current:  r.ToMap(nil),
+		Current:  r.ToMap(),
 		Status:   1,
 	})
 	if errch != nil {
@@ -76,8 +76,8 @@ func (r NoteModel) UpdateNote(m map[string]interface{}) (NoteModel, error) {
 	}
 	errch := PublishMessage(HistoryLog{
 		ID:       r.Id,
-		Previous: r.ToMap(_sel),
-		Current:  m,
+		Previous: r.ToMap(),
+		Current:  _r.ToMap(),
 		Status:   2,
 	})
 	if errch != nil {
@@ -96,7 +96,7 @@ func (r NoteModel) DeleteNote() error {
 	}
 	errch := PublishMessage(HistoryLog{
 		ID:       r.Id,
-		Previous: r.ToMap(nil),
+		Previous: r.ToMap(),
 		Current:  nil,
 		Status:   3,
 	})
@@ -106,24 +106,10 @@ func (r NoteModel) DeleteNote() error {
 	return nil
 }
 
-func (r NoteModel) ToMap(sel []string) map[string]interface{} {
-	_tmp := map[string]interface{}{
+func (r NoteModel) ToMap() map[string]interface{} {
+	return map[string]interface{}{
 		"user":  r.User,
 		"title": r.Title,
 		"note":  r.Note,
 	}
-	if sel != nil {
-		var _k []string
-		for k := range _tmp {
-			for _, v := range sel {
-				if k != v {
-					_k = append(_k, k)
-				}
-			}
-		}
-		for _, idx := range _k {
-			delete(_tmp, idx)
-		}
-	}
-	return _tmp
 }
