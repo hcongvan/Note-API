@@ -31,6 +31,15 @@ func (r NoteModel) CreateNote() (NoteModel, error) {
 	if result.Error != nil {
 		return NoteModel{}, result.Error
 	}
+	errch := PublishMessage(HistoryLog{
+		ID:       r.Id,
+		Previous: nil,
+		Current:  r.ToMap(nil),
+		Status:   1,
+	})
+	if errch != nil {
+		return r, errch
+	}
 	return r, nil
 }
 
@@ -52,15 +61,27 @@ func (r NoteModel) QueryNote() (NoteModel, error) {
 }
 
 func (r NoteModel) UpdateNote(m map[string]interface{}) (NoteModel, error) {
-	_r := r
-	result := db.First(&_r)
+	result := db.First(&r)
 	if result.Error != nil {
 		return NoteModel{}, result.Error
 	}
-
+	_r := r
 	resultUpdate := db.Model(&_r).Select("*").Updates(m)
 	if resultUpdate.Error != nil {
 		return _r, resultUpdate.Error
+	}
+	var _sel []string
+	for k := range m {
+		_sel = append(_sel, k)
+	}
+	errch := PublishMessage(HistoryLog{
+		ID:       r.Id,
+		Previous: r.ToMap(_sel),
+		Current:  m,
+		Status:   2,
+	})
+	if errch != nil {
+		return _r, errch
 	}
 	return _r, nil
 }
@@ -69,8 +90,40 @@ func (r NoteModel) DeleteNote() error {
 	if result := db.First(&r); result.Error != nil {
 		return result.Error
 	}
-	if resultDelete := db.Delete(&r); resultDelete.Error != nil {
+	_r := r
+	if resultDelete := db.Delete(&_r); resultDelete.Error != nil {
 		return resultDelete.Error
 	}
+	errch := PublishMessage(HistoryLog{
+		ID:       r.Id,
+		Previous: r.ToMap(nil),
+		Current:  nil,
+		Status:   3,
+	})
+	if errch != nil {
+		return errch
+	}
 	return nil
+}
+
+func (r NoteModel) ToMap(sel []string) map[string]interface{} {
+	_tmp := map[string]interface{}{
+		"user":  r.User,
+		"title": r.Title,
+		"note":  r.Note,
+	}
+	if sel != nil {
+		var _k []string
+		for k := range _tmp {
+			for _, v := range sel {
+				if k != v {
+					_k = append(_k, k)
+				}
+			}
+		}
+		for _, idx := range _k {
+			delete(_tmp, idx)
+		}
+	}
+	return _tmp
 }

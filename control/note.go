@@ -29,19 +29,6 @@ func CreateNote(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, ResponseMsg{Code: Error, Result: Message{Msg: BadData}})
 		return
 	}
-
-	errch := PublishMessage(
-		HistoryLog{
-			ID:       newNote.Id,
-			Previous: nil,
-			Current:  newNote,
-			Status:   1,
-		},
-	)
-	if errch != nil {
-		c.JSON(http.StatusBadRequest, ResponseMsg{Code: Error, Result: Message{Msg: errch.Error()}})
-		return
-	}
 	c.JSON(http.StatusOK, ResponseMsg{Code: OK, Result: newNote})
 }
 
@@ -63,18 +50,6 @@ func UpdateNote(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, ResponseMsg{Code: Error, Result: Message{Msg: err.Error()}})
 		return
 	}
-	errch := PublishMessage(
-		HistoryLog{
-			ID:       updateNote.Id,
-			Previous: model.NoteModel{},
-			Current:  updateNote,
-			Status:   2,
-		},
-	)
-	if errch != nil {
-		c.JSON(http.StatusBadRequest, ResponseMsg{Code: Error, Result: Message{Msg: BadData}})
-		return
-	}
 	c.JSON(http.StatusOK, ResponseMsg{Code: OK, Result: updateNote})
 }
 
@@ -91,17 +66,5 @@ func DeleteNote(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, ResponseMsg{Code: Error, Result: Message{Msg: DontExist}})
 		return
 	}
-	// errch := PublishMessage(
-	// 	HistoryLog{
-	// 		ID:       deleteNote.Id,
-	// 		Previous: deleteNote,
-	// 		Current:  model.NoteModel{},
-	// 		Status:   3,
-	// 	},
-	// )
-	// if errch != nil {
-	// 	c.JSON(http.StatusBadRequest, ResponseMsg{Code: Error, Result: Message{Msg: BadData}})
-	// 	return
-	// }
 	c.JSON(http.StatusOK, ResponseMsg{Code: OK, Result: Message{Msg: NoteDelete}})
 }
