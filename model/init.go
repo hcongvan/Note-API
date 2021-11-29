@@ -10,7 +10,7 @@ import (
 )
 
 var db *gorm.DB
-var rabbitmq *amqp.Connection
+var channel *amqp.Channel
 
 func InitDB(db_name string) {
 	_db, err := gorm.Open(sqlite.Open(db_name), &gorm.Config{})
@@ -26,5 +26,9 @@ func InitRabbitMQ() {
 	if err != nil {
 		log.Fatalf("%s: %s", err, "fail to connect")
 	}
-	rabbitmq = conn
+	ch, errch := conn.Channel()
+	if errch != nil {
+		log.Fatalf("%s: %s", errch, "fail when open channel")
+	}
+	channel = ch
 }

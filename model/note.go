@@ -22,6 +22,7 @@ func (r *NoteModel) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 func (r *NoteModel) BeforeUpdate(tx *gorm.DB) (err error) {
+
 	r.UpdateAt = time.Now().UTC()
 	return
 }
