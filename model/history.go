@@ -22,7 +22,7 @@ func PublishMessage(body HistoryLog) error {
 	}
 	err := channel.Publish(
 		os.Getenv("RABBIT_EXCHANGE"),
-		os.Getenv("RABBIT_BINDINGKEY"),
+		os.Getenv("RABBIT_ROUTINGKEY"),
 		false,
 		false,
 		amqp.Publishing{

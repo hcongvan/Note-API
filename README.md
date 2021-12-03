@@ -13,7 +13,7 @@
         RABBIT_QUEUE=history_log
         RABBIT_CONSUMERNAME=vanhc_consumer
         RABBIT_EXCHANGE=note
-        RABBIT_BINDINGKEY=note.vanhc
+        RABBIT_ROUTINGKEY=note.vanhc
     ```
 
 ## Deploy step:

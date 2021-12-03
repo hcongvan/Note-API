@@ -14,7 +14,7 @@ import (
 func ReadMessage(msgs <-chan amqp.Delivery) {
 	for d := range msgs {
 		log.Printf(" [x] %s", d.Body)
-		if (d.ContentType == "application/json") && (d.RoutingKey == os.Getenv("RABBIT_BINDINGKEY")) {
+		if (d.ContentType == "application/json") && (d.RoutingKey == os.Getenv("RABBIT_ROUTINGKEY")) {
 			var _tmp map[string]interface{}
 			err := json.Unmarshal(d.Body, &_tmp)
 			if err != nil {
