@@ -2,16 +2,17 @@ package model
 
 import (
 	"encoding/json"
+	"os"
 	"time"
 
 	"github.com/streadway/amqp"
 )
 
 type HistoryLog struct {
-	ID       uint        `json:"id"`
+	ID       uint        `json:"note_id"`
 	Previous interface{} `json:"previous"`
 	Current  interface{} `json:"current"`
-	Status   int         `json:"status"`
+	Type     int         `json:"type"`
 }
 
 func PublishMessage(body HistoryLog) error {
@@ -20,8 +21,8 @@ func PublishMessage(body HistoryLog) error {
 		return errp
 	}
 	err := channel.Publish(
-		"note",
-		"note.vanhc",
+		os.Getenv("RABBIT_EXCHANGE"),
+		os.Getenv("RABBIT_BINDINGKEY"),
 		false,
 		false,
 		amqp.Publishing{
